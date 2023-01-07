@@ -1,20 +1,3 @@
-# Modified by Augmented Startups & Geeky Bee
-# October 2020
-# Facial Recognition Attendence GUI
-# Full Course - https://augmentedstartups.info/yolov4release
-# *-
-# from PyQt5.QtGui import QImage, QPixmap
-# from PyQt5.uic import loadUi
-# from PyQt5.QtCore import pyqtSlot, QTimer, QDate, Qt
-# from PyQt5.QtWidgets import QDialog, QMessageBox, QApplication,QFileDialog
-# from PyQt5 import QtWidgets
-# # from os.path import dirname, join
-# import cv2
-# import face_recognition
-# import numpy as np
-# import datetime
-# import os
-# import csv
 from PyQt5.QtGui import QImage, QPixmap
 from PyQt5.uic import loadUi
 from PyQt5.QtCore import pyqtSlot, QTimer, QDate, Qt
@@ -26,6 +9,7 @@ import datetime
 import os
 import csv
 
+":UI Initialization"
 class Ui_OutputDialog(QDialog):
     def __init__(self):
         super(Ui_OutputDialog, self).__init__()
@@ -37,11 +21,15 @@ class Ui_OutputDialog(QDialog):
         self.Date_label.setText(curdate)
         self.Time_label.setText(curtime)
 
-
         self.image = None
         self._new_window = None
         self.viewbtn.clicked.connect(self.viewfun)
         self.Capture.clicked.connect(self.picap)
+
+
+        img_counter = 0
+        nameimg = 0
+
 
     @pyqtSlot()
     def startVideo(self, camera_name):
@@ -49,12 +37,32 @@ class Ui_OutputDialog(QDialog):
         :param camera_name: link of camera or usb camera
         :return:
         """
-        if len(camera_name) == 1:
-        	self.capture = cv2.VideoCapture(int(camera_name))
-        else:
-        	self.capture = cv2.VideoCapture(camera_name)
+
+        self.capture = cv2.VideoCapture(0)
+
+        #self.mental = self.capture.close()
+
+
+        # while True:
+            #ret, frame = self.capture.read()
+            # print("hey")
+
+            # if k%256 == 32:
+            #     img_name = "Profile_Image_{}.png".format(img_counter)
+            #
+            #     #capture fn
+            #     cv2.imwrite(img_name, frame)
+
+        # if len(camera_name) == 1:
+        # 	self.capture = cv2.VideoCapture(int(camera_name))
+        # else:
+        # 	self.capture = cv2.VideoCapture(camera_name)
+
+
         self.timer = QTimer(self)  # Create Timer
         path = 'ImagesAttendance'
+
+
         if not os.path.exists(path):
             os.mkdir(path)
         # known face encoding and known face name list
@@ -103,12 +111,12 @@ class Ui_OutputDialog(QDialog):
                                                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                             if buttonReply == QMessageBox.Yes:
 
-                                date_time_string = datetime.datetime.now().strftime("%H:%M:%S")
+                                date_time_string = datetime.datetime.now().strftime("%y/%m/%d %H:%M:%S")
                                 f.writelines(f'\n{name},{date_time_string},Clock In')
                                 self.ClockInButton.setChecked(False)
 
                                 self.NameLabel.setText(name)
-                                self.StatusLabel.setText('Clocked In')
+                                self.StatusLabel.setText('Student')
                                 self.HoursLabel.setText('Arrived')
                                 self.MinLabel.setText('')
 
@@ -127,12 +135,12 @@ class Ui_OutputDialog(QDialog):
                         if (name != 'Unknown'):
                             buttonReply = QMessageBox.question(self, 'Cheers ' + name,'Are you Clocking Out?',QMessageBox.Yes | QMessageBox.No,QMessageBox.No)
                             if buttonReply == QMessageBox.Yes:
-                                date_time_string = datetime.datetime.now().strftime("%H:%M:%S")
+                                date_time_string = datetime.datetime.now().strftime("%y/%m/%d %H:%M:%S")
                                 f.writelines(f'\n{name},{date_time_string},Clock Out')
                                 self.ClockOutButton.setChecked(False)
 
                                 self.NameLabel.setText(name)
-                                self.StatusLabel.setText('Leaving')
+                                self.StatusLabel.setText('Student')
                                 self.Time2 = datetime.datetime.now()
                                 # print(self.Time2)
 
@@ -184,11 +192,11 @@ class Ui_OutputDialog(QDialog):
                     if field in row:
                         if field == 'Clock In':
                             if row[0] == name:
-                                Time1 = (datetime.datetime.strptime(row[1], '%H:%M:%S'))
+                                Time1 = (datetime.datetime.strptime(row[1], '%y/%m/%d %H:%M:%S'))
                                 self.TimeList1.append(Time1)
                         if field == 'Clock Out':
                             if row[0] == name:
-                                Time2 = (datetime.datetime.strptime(row[1], '%H:%M:%S'))
+                                Time2 = (datetime.datetime.strptime(row[1], '%y/%m/%d %H:%M:%S'))
                                 self.TimeList2.append(Time2)
 
     def displayImage(self, image, encode_list, class_names, window=1):
@@ -217,6 +225,12 @@ class Ui_OutputDialog(QDialog):
             self.imgLabel.setPixmap(QPixmap.fromImage(outImage))
             self.imgLabel.setScaledContents(True)
 
+    def profun (self):
+        print("Capturing Process")
+        self._new_window1 = Ui_ProfileDialog()
+        self._new_window1.show()
+        print("Showing")
+
     def viewfun (self):
         print("Opening")
         self._new_window = Ui_AttendanceDialog()
@@ -227,6 +241,8 @@ class Ui_OutputDialog(QDialog):
         print("Captured Image")
         msgbox = QMessageBox.question(self, 'Hey','Do you want to Create a new Profile', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if msgbox == QMessageBox.Yes:
+            nameimg = 0
+            self.profun()
             print("Yes")
         else:
             print("No")
@@ -235,3 +251,9 @@ class Ui_AttendanceDialog(QDialog):
     def __init__(self):
         super(Ui_AttendanceDialog, self).__init__()
         loadUi("./attendwindow.ui", self)
+
+
+class Ui_ProfileDialog(QDialog):
+    def __init__(self):
+        super(Ui_ProfileDialog, self).__init__()
+        loadUi("./profilewindow.ui", self)

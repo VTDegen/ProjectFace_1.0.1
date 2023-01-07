@@ -331,7 +331,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Status :</string>
+          <string>Class :</string>
          </property>
         </widget>
        </item>
@@ -361,7 +361,7 @@
           </font>
          </property>
          <property name="text">
-          <string>Checked :</string>
+          <string>Status :</string>
          </property>
         </widget>
        </item>
